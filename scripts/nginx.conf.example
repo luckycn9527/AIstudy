@@ -1,0 +1,29 @@
+# AI 考试学习平台 - Nginx 反向代理示例
+#
+# 将本文件复制到 /etc/nginx/sites-available/aistudy 并按需修改 server_name，
+# 然后:
+#   sudo ln -s /etc/nginx/sites-available/aistudy /etc/nginx/sites-enabled/
+#   sudo nginx -t && sudo systemctl reload nginx
+#
+# 应用本身已由 PM2 在 127.0.0.1:3001 提供完整服务（含前端静态资源）。
+
+server {
+    listen 80;
+    server_name your-domain.com;   # 改成你的域名或服务器 IP
+
+    # 上传大文件（最大 200MB），放宽请求体限制
+    client_max_body_size 210m;
+
+    location / {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # AI 出题/分析耗时较长，延长超时
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+    }
+}

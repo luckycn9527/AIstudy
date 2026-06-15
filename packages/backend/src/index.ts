@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'node:net';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import fs from 'node:fs';
 import { initializeDatabase } from './db/index.js';
 import materialsRouter from './routes/materials.js';
 import subjectsRouter from './routes/subjects.js';
@@ -69,6 +72,18 @@ async function startServer(): Promise<void> {
   app.use('/api/subjects', wrongQuestionsRouter);
 
   app.use('/api/dashboard', dashboardRouter);
+
+  // Serve the built frontend (production). In dev, Vite serves the SPA on :5173.
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const frontendDist = path.resolve(__dirname, '../../frontend/dist');
+  if (fs.existsSync(path.join(frontendDist, 'index.html'))) {
+    app.use(express.static(frontendDist));
+    // SPA fallback: send index.html for any non-API GET route (client-side routing)
+    app.get(/^(?!\/api).*/, (_req, res) => {
+      res.sendFile(path.join(frontendDist, 'index.html'));
+    });
+    console.log(`已启用前端静态资源服务: ${frontendDist}`);
+  }
 
   app.listen(port, () => {
     console.log(`AI 考试学习平台后端服务已启动: http://localhost:${port}`);

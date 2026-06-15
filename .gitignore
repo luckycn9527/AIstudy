@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Runtime data (match at any depth, e.g. packages/backend/data)
+**/data/db.sqlite
+**/data/db.sqlite-shm
+**/data/db.sqlite-wal
+**/data/test/
+**/data/uploads/*
+!**/data/uploads/.gitkeep
+
+# OCR training data (large binary files)
+*.traineddata
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+
+# Test coverage
+coverage/
